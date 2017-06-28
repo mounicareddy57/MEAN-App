@@ -63,7 +63,7 @@ module.exports = (router) => {
                         } else {
                             res.json({
                                 success: true,
-                                message: 'User saved!'
+                                message: 'User registered successfully!'
                             });
                         }
                     });
@@ -71,5 +71,37 @@ module.exports = (router) => {
             }
         }
     });
+    
+    router.get('/checkEmail/:email', (req,res)=>{
+       if(!req.params.email){
+           res.json({success: false, message: 'Email is not provided'});
+       } else{
+           User.findOne({email: req.params.email},(err,user)=>{
+               if(err){
+                   res.json({succes:false, message: err});
+               }if(user){
+                   res.json({success:false,message:'oops..email is already taken'})
+               }else{
+                   res.json({success:true, message:'good to go!!!!'})
+               }
+           })
+       }
+    });
+    router.get('/checkUsername/:username', (req,res)=>{
+       if(!req.params.username){
+           res.json({success: false, message: 'Email is not provided'});
+       } else{
+           User.findOne({username: req.params.username},(err,user)=>{
+               if(err){
+                   res.json({succes:false, message: err});
+               }if(user){
+                   res.json({success:false,message:'oops..username is already taken'})
+               }else{
+                   res.json({success:true, message:'good to go!!!!'})
+               }
+           })
+       }
+    });
+    
     return router;
 }

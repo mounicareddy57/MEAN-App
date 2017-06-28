@@ -6,6 +6,7 @@ const config = require('./config/database.js'); //Mongoose config
 const path = require('path'); //Node package for file paths
 const authentication = require('./routes/authentication')(router);
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 //database connection using mongoose
 mongoose.connect(config.uri, (err)=>{
@@ -17,6 +18,9 @@ mongoose.connect(config.uri, (err)=>{
 });
 
 //middleware
+app.use(cors({
+    origin: 'http://localhost:4200'
+}));
 //parse application
 app.use(bodyParser.urlencoded({extended:false}));
 //parse application/json

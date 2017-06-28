@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms'; 
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -9,8 +10,15 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 export class RegisterComponent implements OnInit {
 
 form : FormGroup;
+messageClass;
+message;
+processing = false;
+emailValid;
+emailMessage;
+usernameValid;
+usernameMessage;
 
- constructor(private formBuilder: FormBuilder) { 
+ constructor(private formBuilder: FormBuilder, private authservice: AuthService) { 
   this.createForm();
   }
   
@@ -72,11 +80,67 @@ return null;
 }else{
     return {'matchingPasswords': true}
 }}
-}
+};
+
+enableForm(){
+this.form.controls['email'].enable();
+this.form.controls['username'].enable();
+this.form.controls['password'].enable();
+this.form.controls['confirm'].enable();
+};
+
+disableForm(){
+this.form.controls['email'].disable();
+this.form.controls['username'].disable();
+this.form.controls['password'].disable();
+this.form.controls['confirm'].disable();
+};
 
 onFormSubmit(){
-console.log("Form submitted");
+this.disableForm();
+const user ={
+email: this.form.get('email').value, //get the email value from the submitted form
+username: this.form.get('username').value,
+password: this.form.get('password').value
+}
+this.authservice.addUser(user).subscribe(data => {
+if(!data.success){
+this.enableForm();
+    this.messageClass = 'alert alert-danger'; //change bootstrap class
+    this.message = data.message; //display message from api
+    this.processing = true;
+}else{
+    this.messageClass = 'alert alert-success';
+    this.message = data.message;
+}
+});
+
 };
+
+checkEmail(){
+this.authservice.checkEmail(this.form.get('email').value).subscribe(data=>{
+if(!data.success){
+this.emailValid = false;
+this.emailMessage = data.message;
+}else{
+this.emailValid = true;
+this.emailMessage = data.message;
+}
+});
+};
+
+checkUsername(){
+this.authservice.checkUsername(this.form.get('username').value).subscribe(data=>{
+if(!data.success){
+this.usernameValid = false;
+this.usernameMessage = data.message;
+}else{
+this.usernameValid = true;
+this.usernameMessage = data.message;
+}
+});
+};
+
 
   ngOnInit() {
   }

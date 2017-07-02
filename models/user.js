@@ -123,8 +123,10 @@ const userSchema = new Schema({
 
 //middleware for encrypting the password before saving
 userSchema.pre('save', function (next) {
+    //Ensure password is new or modified before applying encryption
     if (!this.isModified('password'))
         return next();
+    
     bcrypt.hash(this.password, null, null, (err, hash) => {
         if (err) return next(err);
         this.password = hash;
@@ -133,7 +135,7 @@ userSchema.pre('save', function (next) {
 });
 
 //decrypt the password
-userSchema.methods.comparePassword = (password) => {
+userSchema.methods.comparePassword = function(password){
     return bcrypt.compareSync(password, this.password);
 };
 
